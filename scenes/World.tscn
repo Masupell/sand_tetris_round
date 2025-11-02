@@ -1,19 +1,31 @@
-[gd_scene load_steps=4 format=3 uid="uid://cb8sf5lu5g8wi"]
+[gd_scene load_steps=5 format=3 uid="uid://cb8sf5lu5g8wi"]
 
+[ext_resource type="PackedScene" uid="uid://b2ktwpe1kd50a" path="res://scenes/grid.tscn" id="1_7g83o"]
 [ext_resource type="Shader" uid="uid://bqaj0kj5t3dg1" path="res://Code/Shaders/world.gdshader" id="1_kqs1s"]
-[ext_resource type="Script" uid="uid://dix8ux4mxxisi" path="res://Code/world.gd" id="2_32lhk"]
+[ext_resource type="Script" uid="uid://d0foxsmrx2j3h" path="res://Code/background.gd" id="2_7g83o"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_32lhk"]
 shader = ExtResource("1_kqs1s")
 shader_parameter/size = Vector2(1280, 720)
 shader_parameter/scale = 0.9
-shader_parameter/pixels = 64.0
+shader_parameter/pixels = Vector2(64, 64)
+shader_parameter/resolution = Vector2(1280, 720)
+shader_parameter/line_color = Color(0.2, 0.3, 0.5, 1)
+shader_parameter/thickness = 2.0
+shader_parameter/brightness = 2.0
 
-[node name="ColorRect" type="ColorRect"]
+[node name="World" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_32lhk")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_32lhk")
+script = ExtResource("2_7g83o")
+
+[node name="Grid" parent="." instance=ExtResource("1_7g83o")]
+visible = false
