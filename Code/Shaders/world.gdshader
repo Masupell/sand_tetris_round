@@ -2,6 +2,10 @@ shader_type canvas_item;
 
 uniform vec2 size;
 
+uniform float scale = 0.9;
+
+uniform float pixels = 64.0; // Amount of pixels from top to bottom
+
 float circle(in vec2 uv, float radius)
 {
 	vec2 dist = uv-vec2(0.5);
@@ -20,11 +24,14 @@ void fragment()
 	uv -= 0.5;
 	uv.x *= size.x/size.y;
 	uv += 0.5;
-	vec2 uv_pixel = floor(uv*64.0)/64.0;
+	vec2 uv_pixel = floor(uv*pixels)/pixels;
 	
-	vec3 circle1 = vec3(circle(uv_pixel, 0.9));
+	float scale_2 = scale * exp(-0.2 * TIME);
+	
+	vec3 circle1 = vec3(circle(uv_pixel, scale_2));
 	vec3 circle_outline_color = 0.5 + 0.5 * cos(TIME/10.0+vec3(0.0,2.0,4.0));
-	vec3 circle2 = vec3(smooth_circle(uv_pixel, 1.1, 0.2))*0.5*circle_outline_color;//vec3(0.0, 0.0, 1.0);
+	float smoothness = scale_2*(0.25+scale-scale_2);
+	vec3 circle2 = vec3(smooth_circle(uv_pixel, scale_2+smoothness, smoothness))*0.5*circle_outline_color;//vec3(0.0, 0.0, 1.0);
 	
 	vec3 color = circle1+circle2;
 	

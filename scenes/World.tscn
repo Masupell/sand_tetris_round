@@ -6,6 +6,8 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_32lhk"]
 shader = ExtResource("1_kqs1s")
 shader_parameter/size = Vector2(1280, 720)
+shader_parameter/scale = 0.9
+shader_parameter/pixels = 64.0
 
 [node name="ColorRect" type="ColorRect"]
 material = SubResource("ShaderMaterial_32lhk")
