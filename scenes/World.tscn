@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://cb8sf5lu5g8wi"]
+[gd_scene load_steps=4 format=3 uid="uid://cb8sf5lu5g8wi"]
 
 [ext_resource type="PackedScene" uid="uid://b2ktwpe1kd50a" path="res://scenes/grid.tscn" id="1_7g83o"]
 [ext_resource type="Shader" uid="uid://bqaj0kj5t3dg1" path="res://Code/Shaders/world.gdshader" id="1_kqs1s"]
-[ext_resource type="Script" uid="uid://d0foxsmrx2j3h" path="res://Code/background.gd" id="2_7g83o"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_32lhk"]
 shader = ExtResource("1_kqs1s")
@@ -25,7 +24,5 @@ offset_right = 1280.0
 offset_bottom = 720.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("2_7g83o")
 
 [node name="Grid" parent="." instance=ExtResource("1_7g83o")]
-visible = false

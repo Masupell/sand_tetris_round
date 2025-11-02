@@ -45,7 +45,7 @@ void fragment()
 	uv += 0.5;
 	vec2 uv_pixel = floor(uv*pixels)/pixels;
 	vec2 pixel_size = vec2(1.0)/pixels;
-	uv_pixel = uv_pixel + 0.5*pixel_size;
+	//uv_pixel = uv_pixel + 0.5*pixel_size;
 	
 	//float scale_2 = scale * exp(-0.2 * TIME);
 	

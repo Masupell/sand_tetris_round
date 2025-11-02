@@ -14,10 +14,6 @@ config/name="TetrisRound"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
-[autoload]
-
-Global="*res://Code/global.gd"
-
 [display]
 
 window/size/viewport_width=1280
