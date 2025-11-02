@@ -59,7 +59,15 @@ void fragment()
 	//uv = rotate(uv, TIME * 0.1);
 	float zoom = 64.0;
 	float line_thickness = zoom * thickness / size.y;
-	vec3 color2 = color+(smoothstep(1.0 - line_thickness, 1.0, draw_grid(uv * zoom)) * line_color)*0.5;
+	
+	//Test
+	vec2 dist = uv_pixel-vec2(0.5);
+	float fade_start = scale;
+	float fade = smoothstep(fade_start*0.25, 1.75, dot(dist, dist));
+	vec3 grid = (smoothstep(1.0 - line_thickness, 1.0, draw_grid(uv * zoom)) * line_color)*0.5*(1.0-fade); //(last part is for fade)
+	///
+	
+	vec3 color2 = color+grid;//(smoothstep(1.0 - line_thickness, 1.0, draw_grid(uv * zoom)) * line_color)*0.5;
 	
 	COLOR = vec4(color2, 1.0);
 }
