@@ -43,8 +43,7 @@ void fragment()
 	uv.x *= size.x/size.y;
 	uv += 0.5;
 	vec2 uv_pixel = floor(uv*pixels)/pixels;
-	//vec2 pixel_size = vec2(1.0)/pixels;
-	//uv_pixel = uv_pixel + 0.5*pixel_size;
+	uv_pixel = uv_pixel + 0.5*(1.0/pixels); // puts uv_pixel into center of pixel not corner
 	
 	//float scale_2 = scale * exp(-0.2 * TIME);
 	
