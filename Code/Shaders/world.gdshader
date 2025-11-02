@@ -4,12 +4,11 @@ uniform vec2 size;
 
 uniform float scale = 0.9;
 
-uniform vec2 pixels = vec2(64.0, 64.0); // Amount of pixels from top to bottom
+uniform float pixels = 64.0; // Amount of pixels from top to bottom
 
 
 // Temp:
 
-uniform vec2 resolution = vec2(1280.0, 720.0);
 uniform vec3 line_color: source_color = vec3(0.2, 0.3, 0.5);
 //uniform float zoom: hint_range(1.0, 50.0, 0.1) = 20.0;
 uniform float thickness: hint_range(0.1, 10.0, 0.1) = 2.0;
@@ -44,7 +43,7 @@ void fragment()
 	uv.x *= size.x/size.y;
 	uv += 0.5;
 	vec2 uv_pixel = floor(uv*pixels)/pixels;
-	vec2 pixel_size = vec2(1.0)/pixels;
+	//vec2 pixel_size = vec2(1.0)/pixels;
 	//uv_pixel = uv_pixel + 0.5*pixel_size;
 	
 	//float scale_2 = scale * exp(-0.2 * TIME);
@@ -60,8 +59,8 @@ void fragment()
 	//uv += vec2(sin(TIME) * 0.4, cos(TIME) * 0.6);
 	//uv = rotate(uv, TIME * 0.1);
 	float zoom = 64.0;
-	float line_thickness = zoom * thickness / resolution.y;
-	vec3 color2 = mix(color,smoothstep(1.0 - line_thickness, 1.0, draw_grid(uv * zoom)) * line_color, 0.5);
+	float line_thickness = zoom * thickness / size.y;
+	vec3 color2 = color+(smoothstep(1.0 - line_thickness, 1.0, draw_grid(uv * zoom)) * line_color)*0.5;
 	
 	COLOR = vec4(color2, 1.0);
 }
