@@ -10,11 +10,18 @@ var grid = []
 
 var radius = 0.9 # Same as the shaders, need to make it global or put both together or something like that
 
+@warning_ignore("integer_division")
+var center = Vector2(width/2,height/2)
+
+var time_passed: float = 0.0
+var interval: float = 1.0
+
 enum CellType { EMPTY, SAND, WATER, WALL, BARRIER}
 
 class Cell:
 	var type: int = CellType.EMPTY
 	var extra: int = 0 # Not needed except for water later (moving left or right)
+	var vel: Vector2 = Vector2.ZERO
 	
 	func _init(_type: int = 0, _extra: int = 0) -> void:
 		type = _type
@@ -24,10 +31,14 @@ class Cell:
 func _ready() -> void:
 	grid.resize(64*64)
 	circle()
-	grid[2080].type = CellType.SAND
+	#grid[2080].type = CellType.SAND
 	queue_redraw()
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	time_passed += delta
+	if time_passed >= interval:
+		update_sand()
+		time_passed = 0.0
 	queue_redraw()
 
 func circle():
@@ -79,3 +90,31 @@ func _input(event: InputEvent) -> void:
 		print(grid_pos)
 		#var idx = grid_pos.y * width + grid_pos.x
 		#grid[idx] = 0 if grid[idx] == 1 else 1
+	if event.is_action_released("ui_accept"):
+		spawn_sand()
+
+func spawn_sand(): #Spawns a single sand-block in the center
+	var idx = center.y * width + center.x + 1
+	print(idx)
+	if grid[idx].type == CellType.EMPTY:
+		var angle = randf_range(0.0, TAU)
+		var dir = Vector2(cos(angle), sin(angle))
+		grid[idx].type = CellType.SAND
+		grid[idx].vel = dir
+
+func update_sand():
+	for y in height:
+		for x in width:
+			var idx = y * width + x
+			var cell = grid[idx]
+			if cell.type != CellType.SAND:
+				continue
+			
+			var pos = Vector2(x, y)
+			var dir = (pos-center).normalized()
+			var target = pos + dir.round()
+			
+			var target_idx = target.y as int * width + target.x as int
+			if grid[target_idx].type == CellType.EMPTY:
+				grid[target_idx].type = CellType.SAND
+				cell.type = CellType.EMPTY
