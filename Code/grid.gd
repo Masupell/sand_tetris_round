@@ -14,7 +14,7 @@ var radius = 0.9 # Same as the shaders, need to make it global or put both toget
 var center = Vector2(width/2,height/2)
 
 var time_passed: float = 0.0
-var interval: float = 1.0
+var interval: float = 0.1
 
 enum CellType { EMPTY, SAND, WATER, WALL, BARRIER}
 
@@ -29,7 +29,7 @@ class Cell:
 
 
 func _ready() -> void:
-	grid.resize(64*64)
+	grid.resize(width*height)
 	circle()
 	#grid[2080].type = CellType.SAND
 	queue_redraw()
@@ -83,19 +83,20 @@ func _draw() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.is_released():
-		var pos = event.position
-		print(pos)
-		var grid_pos = Vector2i((pos.x-(1280-width*size)/2)/size, pos.y/size)
-		print(grid_pos)
+	#if event is InputEventMouseButton and event.is_released():
+		#var pos = event.position
+		#print(pos)
+		#var grid_pos = Vector2i((pos.x-(1280-width*size)/2)/size, pos.y/size)
+		#print(grid_pos)
 		#var idx = grid_pos.y * width + grid_pos.x
 		#grid[idx] = 0 if grid[idx] == 1 else 1
 	if event.is_action_released("ui_accept"):
 		spawn_sand()
 
 func spawn_sand(): #Spawns a single sand-block in the center
-	var idx = center.y * width + center.x + 1
-	print(idx)
+	var idx = center.y * width + center.x
+	
+	#print(idx)
 	if grid[idx].type == CellType.EMPTY:
 		var angle = randf_range(0.0, TAU)
 		var dir = Vector2(cos(angle), sin(angle))
@@ -103,18 +104,57 @@ func spawn_sand(): #Spawns a single sand-block in the center
 		grid[idx].vel = dir
 
 func update_sand():
+	@warning_ignore("integer_division")
+	var max_radius = width/2
+	var buckets = []
+	for i in max_radius+1:
+		buckets.append([])
+	
 	for y in height:
 		for x in width:
 			var idx = y * width + x
 			var cell = grid[idx]
 			if cell.type != CellType.SAND:
 				continue
-			
 			var pos = Vector2(x, y)
-			var dir = (pos-center).normalized()
-			var target = pos + dir.round()
+			var d = int((pos - center).length())
+			buckets[d].append(pos)
+	
+	for d in range(max_radius, -1, -1):
+		for pos in buckets[d]:
+			var x = int(pos.x)
+			var y = int(pos.y)
+			var idx = y*width+x
+			var cell = grid[idx]
+			if cell.type != CellType.SAND:
+				continue
 			
+			var dir = (pos - center).normalized()
+			if pos == center:
+				var angle = randf_range(0, TAU)
+				dir = Vector2(cos(angle), sin(angle))
+			var target = pos + dir.round()
 			var target_idx = target.y as int * width + target.x as int
 			if grid[target_idx].type == CellType.EMPTY:
 				grid[target_idx].type = CellType.SAND
-				cell.type = CellType.EMPTY
+				grid[idx].type = CellType.EMPTY
+	#for y in height:
+		#for x in width:
+			#var idx = y * width + x
+			#var cell = grid[idx]
+			#if cell.type != CellType.SAND:
+				#continue
+			#
+			#var pos = Vector2(x, y)
+			#var dir = (pos-center).normalized()
+			#
+			#if pos == center:
+				#var angle = randf_range(0, TAU)
+				#dir = Vector2(cos(angle), sin(angle))
+			#
+			#var target = pos + dir.round()
+			#
+			#var target_idx = target.y as int * width + target.x as int
+			#if grid[target_idx].type == CellType.EMPTY:
+				#grid[target_idx].type = CellType.SAND
+				#grid[idx].type = CellType.EMPTY
