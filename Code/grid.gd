@@ -14,7 +14,7 @@ var radius = 0.9 # Same as the shaders, need to make it global or put both toget
 var center = Vector2(width/2,height/2)
 
 var time_passed: float = 0.0
-var interval: float = 0.1
+var interval: float = 0.05
 
 enum CellType { EMPTY, SAND, WATER, WALL, BARRIER}
 
@@ -22,6 +22,7 @@ class Cell:
 	var type: int = CellType.EMPTY
 	var extra: int = 0 # Not needed except for water later (moving left or right)
 	var vel: Vector2 = Vector2.ZERO
+	var color: Color = Color(0.0, 0.0, 0.0)
 	
 	func _init(_type: int = 0, _extra: int = 0) -> void:
 		type = _type
@@ -79,7 +80,7 @@ func _draw() -> void:
 					@warning_ignore("integer_division")
 					var gap_y = (720-height*size)/2
 					var rect = Rect2(gap_x+x*size, gap_y+y*size, size, size)
-					draw_rect(rect, Color(0.753, 0.898, 0.227, 1.0))
+					draw_rect(rect, box.color)#Color(0.753, 0.898, 0.227, 1.0))
 
 
 func _input(event: InputEvent) -> void:
@@ -92,6 +93,7 @@ func _input(event: InputEvent) -> void:
 		if idx < 64*64:
 			if grid[idx].type == CellType.EMPTY:
 				grid[idx].type = CellType.SAND
+				grid[idx].color = Color(randf(), randf(), randf())
 	if event.is_action_released("ui_accept"):
 		spawn_sand()
 
@@ -104,6 +106,7 @@ func spawn_sand(): #Spawns a single sand-block in the center
 		var dir = Vector2(cos(angle), sin(angle))
 		grid[idx].type = CellType.SAND
 		grid[idx].vel = dir
+		grid[idx].color = Color(randf(), randf(), randf())
 
 
 func update_sand():
@@ -155,5 +158,6 @@ func update_sand():
 				var tidx = ty * width + tx
 				if grid[tidx].type == CellType.EMPTY:
 					grid[tidx].type = CellType.SAND
+					grid[tidx].color = grid[idx].color
 					grid[idx].type = CellType.EMPTY
 					break
