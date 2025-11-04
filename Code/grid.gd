@@ -83,13 +83,15 @@ func _draw() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	#if event is InputEventMouseButton and event.is_released():
-		#var pos = event.position
+	if event is InputEventMouseButton and event.is_released():
+		var pos = event.position
 		#print(pos)
-		#var grid_pos = Vector2i((pos.x-(1280-width*size)/2)/size, pos.y/size)
+		var grid_pos = Vector2i((pos.x-(1280-width*size)/2)/size, pos.y/size)
 		#print(grid_pos)
-		#var idx = grid_pos.y * width + grid_pos.x
-		#grid[idx] = 0 if grid[idx] == 1 else 1
+		var idx = grid_pos.y * width + grid_pos.x
+		if idx < 64*64:
+			if grid[idx].type == CellType.EMPTY:
+				grid[idx].type = CellType.SAND
 	if event.is_action_released("ui_accept"):
 		spawn_sand()
 
@@ -102,6 +104,7 @@ func spawn_sand(): #Spawns a single sand-block in the center
 		var dir = Vector2(cos(angle), sin(angle))
 		grid[idx].type = CellType.SAND
 		grid[idx].vel = dir
+
 
 func update_sand():
 	@warning_ignore("integer_division")
@@ -128,33 +131,29 @@ func update_sand():
 			var cell = grid[idx]
 			if cell.type != CellType.SAND:
 				continue
-			
+		
 			var dir = (pos - center).normalized()
 			if pos == center:
 				var angle = randf_range(0, TAU)
 				dir = Vector2(cos(angle), sin(angle))
-			var target = pos + dir.round()
-			var target_idx = target.y as int * width + target.x as int
-			if grid[target_idx].type == CellType.EMPTY:
-				grid[target_idx].type = CellType.SAND
-				grid[idx].type = CellType.EMPTY
-	#for y in height:
-		#for x in width:
-			#var idx = y * width + x
-			#var cell = grid[idx]
-			#if cell.type != CellType.SAND:
-				#continue
-			#
-			#var pos = Vector2(x, y)
-			#var dir = (pos-center).normalized()
-			#
-			#if pos == center:
-				#var angle = randf_range(0, TAU)
-				#dir = Vector2(cos(angle), sin(angle))
-			#
-			#var target = pos + dir.round()
-			#
-			#var target_idx = target.y as int * width + target.x as int
-			#if grid[target_idx].type == CellType.EMPTY:
-				#grid[target_idx].type = CellType.SAND
-				#grid[idx].type = CellType.EMPTY
+		
+			var primary = dir.round()
+			var perpendicular = Vector2(-dir.y, dir.x)
+			var side1 = (dir + perpendicular).round()
+			var side2 = (dir - perpendicular).round()
+		
+			var positions = []
+			for offset in [primary, side1, side2]:
+				if offset == Vector2.ZERO || offset.dot(dir) <= 0:
+					continue
+				if not (offset in positions):
+					positions.append(offset)
+		
+			for offset in positions:
+				var tx = x + int(offset.x)
+				var ty = y + int(offset.y)
+				var tidx = ty * width + tx
+				if grid[tidx].type == CellType.EMPTY:
+					grid[tidx].type = CellType.SAND
+					grid[idx].type = CellType.EMPTY
+					break
