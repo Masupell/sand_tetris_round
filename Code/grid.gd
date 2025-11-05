@@ -275,8 +275,43 @@ func check_full_circle():
 		var allowed_gap = int(NUM_BINS / (TAU * avg_radius) * 1.5)
 		
 		if largest_gap <= allowed_gap:
-			for pos in cluster:
-				var clear_idx = pos.y * width + pos.x
-				grid[clear_idx].type = CellType.EMPTY
-				sand_cells.erase(clear_idx) # Deleting while iterating over it, but works for now
-				sand_map.erase(clear_idx)
+			if is_ring_connected(color):
+				for pos in cluster:
+					var clear_idx = pos.y * width + pos.x
+					grid[clear_idx].type = CellType.EMPTY
+					#sand_cells.erase(clear_idx) # Deleting while iterating over it, but works for now
+					#sand_map.erase(clear_idx)
+					remove_sand(clear_idx)
+
+func is_ring_connected(color: Color) -> bool:
+	var seen = {}
+	var queue = [Vector2i(center.x, center.y)]
+	
+	while queue.size() > 0:
+		var pos = queue.pop_back()
+		for oy in [-1, 0, 1]:
+			for ox in [-1, 0, 1]:
+				if ox and oy == 0:
+					continue
+				var nx = pos.x + ox
+				var ny = pos.y + oy
+				var nidx = ny * width + nx
+				if seen.has(nidx):
+					continue
+				var nc = grid[nidx]
+				if nc.type == CellType.BARRIER:
+					return false
+				if nc.color != color:#nc.type == CellType.EMPTY:
+					seen[nidx] = true
+					queue.append(Vector2i(nx, ny))
+	return true
+
+func remove_sand(idx: int):
+	var arr_pos = sand_map[idx]
+	var last_idx = sand_cells[sand_cells.size() - 1]
+
+	sand_cells[arr_pos] = last_idx
+	sand_map[last_idx] = arr_pos
+
+	sand_cells.pop_back()
+	sand_map.erase(idx)
