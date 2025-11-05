@@ -18,7 +18,15 @@ var center = Vector2(width/2,height/2)
 var time_passed: float = 0.0
 var circle_check_timer: float = 0.0
 var interval: float = 0.05
-var circle_time: float = 1.0
+var circle_time: float = 5.0#1.0
+
+var colors = [
+	Color(0.753, 0.898, 0.227, 1.0),
+	Color(0.366, 0.41, 0.863, 1.0),
+	Color(0.678, 0.157, 0.149, 1.0),
+	Color(0.249, 0.102, 0.062, 1.0),
+	Color(0.839, 0.851, 0.145, 1.0)
+]
 
 enum CellType { EMPTY, SAND, WATER, WALL, BARRIER}
 
@@ -124,17 +132,18 @@ func _input(event: InputEvent) -> void:
 		spawn_sand()
 
 func spawn_sand(): #Spawns a single sand-block in the center
-	var idx = center.y * width + center.x
-	
-	#print(idx)
-	if grid[idx].type == CellType.EMPTY:
-		var angle = randf_range(0.0, TAU)
-		var dir = Vector2(cos(angle), sin(angle))
-		grid[idx].type = CellType.SAND
-		grid[idx].vel = dir
-		grid[idx].color = Color(randf(), randf(), randf())
-		sand_cells.append(idx)
-		sand_map[idx] = sand_cells.size()-1
+	var color = colors.pick_random()
+	for y in [-1, 0, 1]:
+		for x in [-1, 0, 1]:
+			var idx = (center.y+y) as int * width + (center.x+x) as int
+			if grid[idx].type == CellType.EMPTY:
+				var angle = randf_range(0.0, TAU)
+				var dir = Vector2(cos(angle), sin(angle))
+				grid[idx].type = CellType.SAND
+				grid[idx].vel = dir
+				grid[idx].color = color#Color(randf(), randf(), randf())
+				sand_cells.append(idx)
+				sand_map[idx] = sand_cells.size()-1
 
 
 func update_sand():
