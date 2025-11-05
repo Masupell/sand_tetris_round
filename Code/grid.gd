@@ -7,6 +7,8 @@ var height = 64
 var size = 720.0/64.0 # Based on the height of the screen, 64 "pixels" along it (in the background shader)
 
 var grid = []
+var sand_cells = []
+var sand_map = {}
 
 var radius = 0.9 # Same as the shaders, need to make it global or put both together or something like that
 
@@ -105,6 +107,8 @@ func _input(event: InputEvent) -> void:
 							if grid[idx].type == CellType.EMPTY:
 								grid[idx].type = CellType.SAND
 								grid[idx].color = Color(0.753, 0.898, 0.227, 1.0)#Color(randf(), randf(), randf())
+								sand_cells.append(idx)
+								sand_map[idx] = sand_cells.size()-1
 			MOUSE_BUTTON_RIGHT:
 				for y in [-1, 0, 1]:
 					for x in [-1, 0, 1]:
@@ -114,6 +118,8 @@ func _input(event: InputEvent) -> void:
 							if grid[idx].type == CellType.EMPTY:
 								grid[idx].type = CellType.SAND
 								grid[idx].color = Color(0.366, 0.41, 0.863, 1.0)
+								sand_cells.append(idx)
+								sand_map[idx] = sand_cells.size()-1
 	if event.is_action_released("ui_accept"):
 		spawn_sand()
 
@@ -127,6 +133,8 @@ func spawn_sand(): #Spawns a single sand-block in the center
 		grid[idx].type = CellType.SAND
 		grid[idx].vel = dir
 		grid[idx].color = Color(randf(), randf(), randf())
+		sand_cells.append(idx)
+		sand_map[idx] = sand_cells.size()-1
 
 
 func update_sand():
@@ -180,6 +188,11 @@ func update_sand():
 					grid[tidx].type = CellType.SAND
 					grid[tidx].color = grid[idx].color
 					grid[idx].type = CellType.EMPTY
+					
+					var arr_pos = sand_map[idx]
+					sand_cells[arr_pos] = tidx
+					sand_map.erase(idx)
+					sand_map[tidx] = arr_pos
 					break
 
 func angle_of(pos: Vector2) -> float:
@@ -190,80 +203,80 @@ func angle_of(pos: Vector2) -> float:
 func check_full_circle():
 	var seen = {}
 
-	for y in height:
-		for x in width:
-			var idx = y * width + x
-			if seen.has(idx):
+	for idx in sand_cells:
+		var x = idx % width
+		var y = int(idx / width)
+		if seen.has(idx):
+			continue
+		var cell = grid[idx]
+		
+		var color = cell.color
+		var queue = [Vector2i(x, y)]
+		var cluster = []
+		var angles = []
+		var sum_radius = 0.0
+		var count = 0
+		
+		while queue.size() > 0:
+			var p = queue.pop_back()
+			var pidx = p.y * width + p.x
+			if seen.has(pidx):
 				continue
-			var cell = grid[idx]
-			if cell.type != CellType.SAND:
-				continue
-			
-			var color = cell.color
-			var queue = [Vector2i(x, y)]
-			var cluster = []
-			var angles = []
-			var sum_radius = 0.0
-			var count = 0
-			
-			while queue.size() > 0:
-				var p = queue.pop_back()
-				var pidx = p.y * width + p.x
-				if seen.has(pidx):
-					continue
-				seen[pidx] = true
+			seen[pidx] = true
 
-				var c = grid[pidx]
-				if c.type != CellType.SAND or c.color != color:
-					continue
-				
-				cluster.append(p)
-				angles.append(angle_of(p))
-				
-				var r = (Vector2(p.x, p.y) - center).length()
-				sum_radius += r
-				count += 1
-				
-				for oy in [-1, 0, 1]:
-					for ox in [-1, 0, 1]:
-						if ox == 0 and oy == 0:
-							continue
-						var nx = p.x + ox
-						var ny = p.y + oy
-						var nidx = ny * width + nx
-						if seen.has(nidx):
-							continue
-						var nc = grid[nidx]
-						if nc.type == CellType.SAND and nc.color == color:
-							queue.append(Vector2i(nx, ny))
-			
-			if count == 0:
+			var c = grid[pidx]
+			if c.color != color:
 				continue
 			
-			var avg_radius = sum_radius / max(1, count)
+			cluster.append(p)
+			angles.append(angle_of(p))
 			
-			if avg_radius < 2.5:
-				continue
-				
-			angles.sort()
+			var r = (Vector2(p.x, p.y) - center).length()
+			sum_radius += r
+			count += 1
 			
-			var largest_gap = 0.0
-			for i in angles.size()-1:
-				var gap = angles[i+1] - angles[i]
-				if gap > largest_gap:
-					largest_gap = gap
+			for oy in [-1, 0, 1]:
+				for ox in [-1, 0, 1]:
+					if ox == 0 and oy == 0:
+						continue
+					var nx = p.x + ox
+					var ny = p.y + oy
+					var nidx = ny * width + nx
+					if seen.has(nidx):
+						continue
+					var nc = grid[nidx]
+					if nc.type == CellType.SAND and nc.color == color:
+						queue.append(Vector2i(nx, ny))
+		
+		if count == 0:
+			continue
+		
+		var avg_radius = sum_radius / max(1, count)
+		
+		if avg_radius < 2.5:
+			continue
 			
-			var wrap_gap = angles[0] + TAU - angles[angles.size() - 1]
-			if wrap_gap > largest_gap:
-				largest_gap = wrap_gap
-			
-			var circumference_cells = max(8, int(round(TAU * avg_radius)))
-			var angle_per_cell = TAU / float(circumference_cells)
-			
-			var gap_factor = 1.5
-			var allowed_gap = angle_per_cell * gap_factor
-			
-			if largest_gap <= allowed_gap:
-				for pos in cluster:
-					var clear_idx = pos.y * width + pos.x
-					grid[clear_idx].type = CellType.EMPTY
+		angles.sort()
+		
+		var largest_gap = 0.0
+		for i in angles.size()-1:
+			var gap = angles[i+1] - angles[i]
+			if gap > largest_gap:
+				largest_gap = gap
+		
+		var wrap_gap = angles[0] + TAU - angles[angles.size() - 1]
+		if wrap_gap > largest_gap:
+			largest_gap = wrap_gap
+		
+		var circumference_cells = max(8, int(round(TAU * avg_radius)))
+		var angle_per_cell = TAU / float(circumference_cells)
+		
+		var gap_factor = 1.5
+		var allowed_gap = angle_per_cell * gap_factor
+		
+		if largest_gap <= allowed_gap:
+			for pos in cluster:
+				var clear_idx = pos.y * width + pos.x
+				grid[clear_idx].type = CellType.EMPTY
+				sand_cells.erase(clear_idx) # Deleting while iterating over it, but works for now
+				sand_map.erase(clear_idx)
