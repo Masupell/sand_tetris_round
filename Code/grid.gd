@@ -14,7 +14,9 @@ var radius = 0.9 # Same as the shaders, need to make it global or put both toget
 var center = Vector2(width/2,height/2)
 
 var time_passed: float = 0.0
+var circle_check_timer: float = 0.0
 var interval: float = 0.05
+var circle_time: float = 1.0
 
 enum CellType { EMPTY, SAND, WATER, WALL, BARRIER}
 
@@ -37,9 +39,12 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	time_passed += delta
+	circle_check_timer += delta
 	if time_passed >= interval:
 		update_sand()
 		time_passed = 0.0
+	if circle_check_timer >= circle_time:
+		check_full_circle()
 	queue_redraw()
 
 func circle():
@@ -89,11 +94,26 @@ func _input(event: InputEvent) -> void:
 		#print(pos)
 		var grid_pos = Vector2i((pos.x-(1280-width*size)/2)/size, pos.y/size)
 		#print(grid_pos)
-		var idx = grid_pos.y * width + grid_pos.x
-		if idx < 64*64:
-			if grid[idx].type == CellType.EMPTY:
-				grid[idx].type = CellType.SAND
-				grid[idx].color = Color(randf(), randf(), randf())
+		
+		match event.button_index:
+			MOUSE_BUTTON_LEFT:
+				for y in [-1, 0, 1]:
+					for x in [-1, 0, 1]:
+						var idx = (grid_pos.y+y) * width + (grid_pos.x+x)
+						if idx < 64*64:
+							#print(cell_angle(grid_pos))
+							if grid[idx].type == CellType.EMPTY:
+								grid[idx].type = CellType.SAND
+								grid[idx].color = Color(0.753, 0.898, 0.227, 1.0)#Color(randf(), randf(), randf())
+			MOUSE_BUTTON_RIGHT:
+				for y in [-1, 0, 1]:
+					for x in [-1, 0, 1]:
+						var idx = (grid_pos.y+y) * width + (grid_pos.x+x)
+						if idx < 64*64:
+							#print(cell_angle(grid_pos))
+							if grid[idx].type == CellType.EMPTY:
+								grid[idx].type = CellType.SAND
+								grid[idx].color = Color(0.366, 0.41, 0.863, 1.0)
 	if event.is_action_released("ui_accept"):
 		spawn_sand()
 
@@ -161,3 +181,89 @@ func update_sand():
 					grid[tidx].color = grid[idx].color
 					grid[idx].type = CellType.EMPTY
 					break
+
+func angle_of(pos: Vector2) -> float:
+	# pos are integer cell coordinates
+	var a = atan2(pos.y - center.y, pos.x - center.x)
+	return fmod(a + TAU, TAU)
+
+func check_full_circle():
+	var seen = {}
+
+	for y in height:
+		for x in width:
+			var idx = y * width + x
+			if seen.has(idx):
+				continue
+			var cell = grid[idx]
+			if cell.type != CellType.SAND:
+				continue
+			
+			var color = cell.color
+			var queue = [Vector2i(x, y)]
+			var cluster = []
+			var angles = []
+			var sum_radius = 0.0
+			var count = 0
+			
+			while queue.size() > 0:
+				var p = queue.pop_back()
+				var pidx = p.y * width + p.x
+				if seen.has(pidx):
+					continue
+				seen[pidx] = true
+
+				var c = grid[pidx]
+				if c.type != CellType.SAND or c.color != color:
+					continue
+				
+				cluster.append(p)
+				angles.append(angle_of(p))
+				
+				var r = (Vector2(p.x, p.y) - center).length()
+				sum_radius += r
+				count += 1
+				
+				for oy in [-1, 0, 1]:
+					for ox in [-1, 0, 1]:
+						if ox == 0 and oy == 0:
+							continue
+						var nx = p.x + ox
+						var ny = p.y + oy
+						var nidx = ny * width + nx
+						if seen.has(nidx):
+							continue
+						var nc = grid[nidx]
+						if nc.type == CellType.SAND and nc.color == color:
+							queue.append(Vector2i(nx, ny))
+			
+			if count == 0:
+				continue
+			
+			var avg_radius = sum_radius / max(1, count)
+			
+			if avg_radius < 2.5:
+				continue
+				
+			angles.sort()
+			
+			var largest_gap = 0.0
+			for i in angles.size()-1:
+				var gap = angles[i+1] - angles[i]
+				if gap > largest_gap:
+					largest_gap = gap
+			
+			var wrap_gap = angles[0] + TAU - angles[angles.size() - 1]
+			if wrap_gap > largest_gap:
+				largest_gap = wrap_gap
+			
+			var circumference_cells = max(8, int(round(TAU * avg_radius)))
+			var angle_per_cell = TAU / float(circumference_cells)
+			
+			var gap_factor = 1.5
+			var allowed_gap = angle_per_cell * gap_factor
+			
+			if largest_gap <= allowed_gap:
+				for pos in cluster:
+					var clear_idx = pos.y * width + pos.x
+					grid[clear_idx].type = CellType.EMPTY
