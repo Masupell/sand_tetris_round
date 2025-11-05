@@ -196,24 +196,23 @@ func update_sand():
 					break
 
 func angle_of(pos: Vector2) -> float:
-	# pos are integer cell coordinates
 	var a = atan2(pos.y - center.y, pos.x - center.x)
 	return fmod(a + TAU, TAU)
 
 func check_full_circle():
 	var seen = {}
+	const NUM_BINS = 512
 
 	for idx in sand_cells:
-		var x = idx % width
-		var y = int(idx / width)
 		if seen.has(idx):
 			continue
+		var x = idx % width
+		var y = int(idx / width)
 		var cell = grid[idx]
 		
 		var color = cell.color
 		var queue = [Vector2i(x, y)]
 		var cluster = []
-		var angles = []
 		var sum_radius = 0.0
 		var count = 0
 		
@@ -229,8 +228,6 @@ func check_full_circle():
 				continue
 			
 			cluster.append(p)
-			angles.append(angle_of(p))
-			
 			var r = (Vector2(p.x, p.y) - center).length()
 			sum_radius += r
 			count += 1
@@ -255,24 +252,27 @@ func check_full_circle():
 		
 		if avg_radius < 2.5:
 			continue
-			
-		angles.sort()
+		
+		var bins = PackedInt32Array()
+		bins.resize(NUM_BINS)
+		for pos in cluster:
+			var dx = pos.x - center.x
+			var dy = pos.y - center.y
+			var angle = atan2(dy, dx)
+			var bin_idx = int((angle + TAU) / TAU * NUM_BINS) % NUM_BINS
+			bins[bin_idx] = 1
 		
 		var largest_gap = 0.0
-		for i in angles.size()-1:
-			var gap = angles[i+1] - angles[i]
-			if gap > largest_gap:
-				largest_gap = gap
-		
-		var wrap_gap = angles[0] + TAU - angles[angles.size() - 1]
-		if wrap_gap > largest_gap:
-			largest_gap = wrap_gap
-		
-		var circumference_cells = max(8, int(round(TAU * avg_radius)))
-		var angle_per_cell = TAU / float(circumference_cells)
-		
-		var gap_factor = 1.5
-		var allowed_gap = angle_per_cell * gap_factor
+		var current_gap = 0
+		for i in NUM_BINS*2:
+			if bins[i % NUM_BINS] == 0:
+				current_gap += 1
+				if current_gap > largest_gap:
+					largest_gap = current_gap
+			else:
+				current_gap = 0
+
+		var allowed_gap = int(NUM_BINS / (TAU * avg_radius) * 1.5)
 		
 		if largest_gap <= allowed_gap:
 			for pos in cluster:
