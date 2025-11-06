@@ -395,19 +395,20 @@ func move_down():
 		var angle = randf_range(0, TAU)
 		dir = Vector2(cos(angle), sin(angle))
 	var offset = Vector2i(dir.round())
+	var new_positions = []
 	for pos in tetris_pieces:
 		var new_pos = pos+offset
 		var idx = new_pos.y * width + new_pos.x
 		if grid[idx].type != CellType.EMPTY and grid[idx].type != CellType.TETRIS:
 			to_sand()
 			return
-	for i in tetris_pieces.size():
-		var old_idx = tetris_pieces[i].y * width + tetris_pieces[i].x
-		grid[old_idx].type = CellType.EMPTY
-		tetris_pieces[i] += offset
-		var new_idx = tetris_pieces[i].y * width + tetris_pieces[i].x
-		grid[new_idx].type = CellType.TETRIS
-		grid[new_idx].color = tetris_color
+		new_positions.append(new_pos)
+		grid[pos.y * width + pos.x].type = CellType.EMPTY
+	tetris_pieces = new_positions
+	for pos in tetris_pieces:
+		var idx = pos.y * width + pos.x
+		grid[idx].type = CellType.TETRIS
+		grid[idx].color = tetris_color
 	anchor += offset
 
 
