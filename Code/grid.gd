@@ -18,8 +18,9 @@ var center = Vector2(width/2,height/2)
 var time_passed: float = 0.0
 var circle_check_timer: float = 0.0
 var interval: float = 0.05
-var circle_time: float = 5.0#1.0
+var circle_time: float = 0.25
 
+enum ColorChoice {GREEN, BLUE, RED, BROWN, YELLOW} # Maybe for later, probably gonna remove it
 var colors = [
 	Color(0.753, 0.898, 0.227, 1.0),
 	Color(0.366, 0.41, 0.863, 1.0),
@@ -55,6 +56,7 @@ func _physics_process(delta: float) -> void:
 		time_passed = 0.0
 	if circle_check_timer >= circle_time:
 		check_full_circle()
+		circle_check_timer = 0.0
 	queue_redraw()
 
 func circle():
@@ -254,7 +256,7 @@ func check_full_circle():
 					if nc.type == CellType.SAND and nc.color == color:
 						queue.append(Vector2i(nx, ny))
 		
-		if count == 0:
+		if count < 120:#== 0:
 			continue
 		
 		var avg_radius = sum_radius / max(1, count)
