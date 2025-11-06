@@ -86,11 +86,17 @@ func _physics_process(delta: float) -> void:
 	if time_passed >= interval:
 		update_sand()
 		if piece_active:
-			move_down()
+			if Input.is_action_pressed("space"):
+				move_down()
 		time_passed = 0.0
 	if circle_check_timer >= circle_time:
 		check_full_circle()
 		circle_check_timer = 0.0
+	if piece_active:
+		if Input.is_action_pressed("clockwise"):
+			move_tetris(PI/height)
+		elif Input.is_action_pressed("counter_clockwise"):
+			move_tetris(-PI/height)
 	queue_redraw()
 
 func circle():
@@ -167,12 +173,6 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_released("ui_accept"):
 		#spawn_sand()
 		spawn_tetris()
-	
-	if piece_active:
-		if event.is_action_pressed("clockwise"):
-			move_tetris(PI/height)
-		elif event.is_action_pressed("counter_clockwise"):
-			move_tetris(-PI/height)
 
 func spawn_sand(): #Spawns a single sand-block in the center
 	var color = colors.pick_random()
@@ -387,7 +387,11 @@ func spawn_tetris():
 
 
 func move_tetris(angle: float):
-	pass
+	var relative = Vector2(anchor) - center
+	var rotated = Vector2(relative.x * cos(angle) - relative.y * sin(angle), relative.x * sin(angle) + relative.y * cos(angle))
+	var new_pos = Vector2i((center+rotated).round())
+	var offset = new_pos-anchor
+	move(offset)
 
 func move_down():
 	var dir = (Vector2(anchor) - center).normalized()
@@ -395,6 +399,9 @@ func move_down():
 		var angle = randf_range(0, TAU)
 		dir = Vector2(cos(angle), sin(angle))
 	var offset = Vector2i(dir.round())
+	move(offset)
+
+func move(offset: Vector2i):
 	var new_positions = []
 	for pos in tetris_pieces:
 		var new_pos = pos+offset
@@ -405,12 +412,12 @@ func move_down():
 		new_positions.append(new_pos)
 		grid[pos.y * width + pos.x].type = CellType.EMPTY
 	tetris_pieces = new_positions
+	
 	for pos in tetris_pieces:
 		var idx = pos.y * width + pos.x
 		grid[idx].type = CellType.TETRIS
 		grid[idx].color = tetris_color
 	anchor += offset
-
 
 func to_sand():
 	for pos in tetris_pieces:
