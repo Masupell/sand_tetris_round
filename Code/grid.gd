@@ -378,7 +378,7 @@ func spawn_tetris():
 	anchor = center
 	tetris_color = colors.pick_random()
 	
-	for i in tetris_pieces.size():
+	for i in range(tetris_pieces.size()):
 		tetris_pieces[i] += anchor
 		var idx = tetris_pieces[i].y * width + tetris_pieces[i].x
 		grid[idx].type = CellType.TETRIS
@@ -395,22 +395,19 @@ func move_down():
 		var angle = randf_range(0, TAU)
 		dir = Vector2(cos(angle), sin(angle))
 	var offset = Vector2i(dir.round())
-	var new_positions = []
 	for pos in tetris_pieces:
-		new_positions.append(pos+offset)
-	for pos in new_positions:
-		var idx = pos.y * width + pos.x
+		var new_pos = pos+offset
+		var idx = new_pos.y * width + new_pos.x
 		if grid[idx].type != CellType.EMPTY and grid[idx].type != CellType.TETRIS:
 			to_sand()
 			return
-	for pos in tetris_pieces:
-		var idx = pos.y * width + pos.x
-		grid[idx].type = CellType.EMPTY
-	tetris_pieces = new_positions
-	for pos in tetris_pieces:
-		var idx = pos.y * width + pos.x
-		grid[idx].type = CellType.TETRIS
-		grid[idx].color = tetris_color
+	for i in tetris_pieces.size():
+		var old_idx = tetris_pieces[i].y * width + tetris_pieces[i].x
+		grid[old_idx].type = CellType.EMPTY
+		tetris_pieces[i] += offset
+		var new_idx = tetris_pieces[i].y * width + tetris_pieces[i].x
+		grid[new_idx].type = CellType.TETRIS
+		grid[new_idx].color = tetris_color
 	anchor += offset
 
 
