@@ -388,9 +388,9 @@ func spawn_tetris():
 
 func move_tetris(angle: float):
 	var relative = Vector2(anchor) - center
-	var rotated = Vector2(relative.x * cos(angle) - relative.y * sin(angle), relative.x * sin(angle) + relative.y * cos(angle))
-	var new_pos = Vector2i((center+rotated).round())
-	var offset = new_pos-anchor
+	var rotated = Vector2(relative.x * cos(angle*10) - relative.y * sin(angle*10), relative.x * sin(angle*10) + relative.y * cos(angle*10))
+	var new_pos = center+rotated
+	var offset = Vector2i((new_pos-Vector2(anchor)).round())
 	move(offset)
 
 func move_down():
