@@ -57,7 +57,7 @@ void fragment()
 	
 	//uv += vec2(sin(TIME) * 0.4, cos(TIME) * 0.6);
 	//uv = rotate(uv, TIME * 0.1);
-	float zoom = 64.0;
+	float zoom = pixels;
 	float line_thickness = zoom * thickness / size.y;
 	
 	//Test

@@ -1,10 +1,12 @@
 class_name Grid
 extends Node2D
 
-var width = 64
-var height = 64
+var width: int# = 64
+var height: int# = 64
 
-var size = 720.0/64.0 # Based on the height of the screen, 64 "pixels" along it (in the background shader)
+var size = 720.0#/height # Based on the height of the screen, 64 "pixels" along it (in the background shader)
+
+var min_cluster_size: int
 
 var grid = []
 var sand_cells = []
@@ -12,8 +14,8 @@ var sand_map = {}
 
 var radius = 0.9 # Same as the shaders, need to make it global or put both together or something like that
 
-@warning_ignore("integer_division")
-var center = Vector2(width/2,height/2)
+#@warning_ignore("integer_division")
+var center: Vector2# = Vector2(width/2,height/2)
 
 var time_passed: float = 0.0
 var circle_check_timer: float = 0.0
@@ -42,11 +44,20 @@ class Cell:
 		extra = _extra
 
 
-func _ready() -> void:
+#func _ready() -> void:
+	#print("Hello")
+	#grid.resize(width*height)
+	#circle()
+	##grid[2080].type = CellType.SAND
+	#queue_redraw()
+
+func setup():
+	size = size/height
+	@warning_ignore("integer_division")
+	center = Vector2(width/2,height/2)
+	min_cluster_size = height*2
 	grid.resize(width*height)
 	circle()
-	#grid[2080].type = CellType.SAND
-	queue_redraw()
 
 func _physics_process(delta: float) -> void:
 	time_passed += delta
@@ -112,7 +123,7 @@ func _input(event: InputEvent) -> void:
 				for y in [-1, 0, 1]:
 					for x in [-1, 0, 1]:
 						var idx = (grid_pos.y+y) * width + (grid_pos.x+x)
-						if idx < 64*64:
+						if idx < width*height:
 							#print(cell_angle(grid_pos))
 							if grid[idx].type == CellType.EMPTY:
 								grid[idx].type = CellType.SAND
@@ -123,7 +134,7 @@ func _input(event: InputEvent) -> void:
 				for y in [-1, 0, 1]:
 					for x in [-1, 0, 1]:
 						var idx = (grid_pos.y+y) * width + (grid_pos.x+x)
-						if idx < 64*64:
+						if idx < width*height:
 							#print(cell_angle(grid_pos))
 							if grid[idx].type == CellType.EMPTY:
 								grid[idx].type = CellType.SAND
@@ -256,7 +267,7 @@ func check_full_circle():
 					if nc.type == CellType.SAND and nc.color == color:
 						queue.append(Vector2i(nx, ny))
 		
-		if count < 120:#== 0:
+		if count < min_cluster_size:#== 0:
 			continue
 		
 		var avg_radius = sum_radius / max(1, count)
