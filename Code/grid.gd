@@ -22,6 +22,27 @@ var circle_check_timer: float = 0.0
 var interval: float = 0.05
 var circle_time: float = 0.25
 
+
+var tetris_pieces: Array = []
+var anchor: Vector2i
+var piece_active: bool = false
+var tetris_color: Color
+
+#enum SHAPES {STRAIGHT, SQUARE, LSHAPE, TSHAPE, DIAGONAL}
+var TETRIS_SHAPES = { # A lot of manual values, but works for now and need 0,0 as rotation and anchor point
+	straight = [Vector2i(-2,0), Vector2i(-1,0), Vector2i(0,0), Vector2i(1,0), Vector2i(2, 0)],
+	square = [
+			Vector2i(-2,-2), Vector2i(-1,-2), Vector2i(0,-2), Vector2i(1,-2), Vector2i(2,-2), 
+			Vector2i(-2,-1), Vector2i(-1,-1), Vector2i(0,-1), Vector2i(1,-1), Vector2i(2,-1), 
+			Vector2i(-2,0), Vector2i(-1,0), Vector2i(0,0), Vector2i(1,0), Vector2i(2,0), 
+			Vector2i(-2,1), Vector2i(-1,1), Vector2i(0,1), Vector2i(1,1), Vector2i(2,1), 
+			Vector2i(-2,2), Vector2i(-1,2), Vector2i(0,2), Vector2i(1,2), Vector2i(2,2)],
+	l_shape =  [Vector2i(0,-2), Vector2i(0,-1), Vector2i(0,0), Vector2i(1,0), Vector2i(2,0)],
+	t_shape =  [Vector2i(-1,0), Vector2i(0,0), Vector2i(1,0), Vector2i(0,-1)],
+	diagonal =  [Vector2i(-2,-2), Vector2i(-1,-1), Vector2i(0,0), Vector2i(1,1), Vector2i(2,2)]
+}
+
+
 enum ColorChoice {GREEN, BLUE, RED, BROWN, YELLOW} # Maybe for later, probably gonna remove it
 var colors = [
 	Color(0.753, 0.898, 0.227, 1.0),
@@ -31,7 +52,7 @@ var colors = [
 	Color(0.839, 0.851, 0.145, 1.0)
 ]
 
-enum CellType { EMPTY, SAND, WATER, WALL, BARRIER}
+enum CellType { EMPTY, SAND, TETRIS, WATER, WALL, BARRIER}
 
 class Cell:
 	var type: int = CellType.EMPTY
@@ -64,6 +85,8 @@ func _physics_process(delta: float) -> void:
 	circle_check_timer += delta
 	if time_passed >= interval:
 		update_sand()
+		if piece_active:
+			move_down()
 		time_passed = 0.0
 	if circle_check_timer >= circle_time:
 		check_full_circle()
@@ -102,7 +125,7 @@ func _draw() -> void:
 			#draw_rect(outer_rect, Color(1.0, 1.0, 1.0, 0.5))
 			#draw_rect(inner_rect, Color(1.0, 0.0, 0.0, 0.5))
 			match box.type:
-				CellType.SAND: # Only Sand for now, but still match, so I just have to add water, etc later
+				CellType.SAND, CellType.TETRIS: # Only Sand for now, but still match, so I just have to add water, etc later
 					@warning_ignore("integer_division")
 					var gap_x = (1280-width*size)/2
 					@warning_ignore("integer_division")
@@ -142,7 +165,14 @@ func _input(event: InputEvent) -> void:
 								sand_cells.append(idx)
 								sand_map[idx] = sand_cells.size()-1
 	if event.is_action_released("ui_accept"):
-		spawn_sand()
+		#spawn_sand()
+		spawn_tetris()
+	
+	if piece_active:
+		if event.is_action_pressed("clockwise"):
+			move_tetris(PI/height)
+		elif event.is_action_pressed("counter_clockwise"):
+			move_tetris(-PI/height)
 
 func spawn_sand(): #Spawns a single sand-block in the center
 	var color = colors.pick_random()
@@ -333,3 +363,64 @@ func remove_sand(idx: int):
 
 	sand_cells.pop_back()
 	sand_map.erase(idx)
+
+
+
+func spawn_tetris():
+	if piece_active:
+		return
+	tetris_pieces.clear()
+	
+	var shapes = TETRIS_SHAPES.values()
+	var random_shape = shapes[randi()%shapes.size()]
+	tetris_pieces = random_shape.duplicate()
+	
+	anchor = center
+	tetris_color = colors.pick_random()
+	
+	for i in tetris_pieces.size():
+		tetris_pieces[i] += anchor
+		var idx = tetris_pieces[i].y * width + tetris_pieces[i].x
+		grid[idx].type = CellType.TETRIS
+		grid[idx].color = tetris_color
+	piece_active = true
+
+
+func move_tetris(angle: float):
+	pass
+
+func move_down():
+	var dir = (Vector2(anchor) - center).normalized()
+	if anchor == Vector2i(center):
+		var angle = randf_range(0, TAU)
+		dir = Vector2(cos(angle), sin(angle))
+	var offset = Vector2i(dir.round())
+	var new_positions = []
+	for pos in tetris_pieces:
+		new_positions.append(pos+offset)
+	for pos in new_positions:
+		var idx = pos.y * width + pos.x
+		if grid[idx].type != CellType.EMPTY and grid[idx].type != CellType.TETRIS:
+			to_sand()
+			return
+	for pos in tetris_pieces:
+		var idx = pos.y * width + pos.x
+		grid[idx].type = CellType.EMPTY
+	tetris_pieces = new_positions
+	for pos in tetris_pieces:
+		var idx = pos.y * width + pos.x
+		grid[idx].type = CellType.TETRIS
+		grid[idx].color = tetris_color
+	anchor += offset
+
+
+func to_sand():
+	for pos in tetris_pieces:
+		var idx = pos.y * width + pos.x
+		grid[idx].type = CellType.SAND
+		sand_cells.append(idx)
+		sand_map[idx] = sand_cells.size()-1
+	tetris_pieces.clear()
+	piece_active = false
+
+var test = {one = 0, hello = 23}

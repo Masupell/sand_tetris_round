@@ -4,7 +4,7 @@ extends Node2D
 @export var pixels = 64
 
 func _ready() -> void:
-	print("First")
+	randomize()
 	$Grid.height = pixels
 	$Grid.width = pixels
 	$Grid.setup()
