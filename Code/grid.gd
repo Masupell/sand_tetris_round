@@ -175,15 +175,11 @@ func update_sand():
 			var pos = Vector2(x, y)
 			var d = int((pos - center).length())
 			buckets[d].append(pos)
-	
 	for d in range(max_radius, -1, -1):
 		for pos in buckets[d]:
 			var x = int(pos.x)
 			var y = int(pos.y)
 			var idx = y*width+x
-			var cell = grid[idx]
-			if cell.type != CellType.SAND:
-				continue
 		
 			var dir = (pos - center).normalized()
 			if pos == center:
