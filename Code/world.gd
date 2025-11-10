@@ -1,7 +1,7 @@
 class_name World
 extends Node2D
 
-@export var pixels = 64
+@export var pixels = 32
 
 func _ready() -> void:
 	randomize()

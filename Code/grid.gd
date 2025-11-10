@@ -28,9 +28,14 @@ var anchor: Vector2i
 var piece_active: bool = false
 var tetris_color: Color
 
+var tetris_timer: float = 0.0
+var tetris_time: float = 0.5
+
 #enum SHAPES {STRAIGHT, SQUARE, LSHAPE, TSHAPE, DIAGONAL}
 var TETRIS_SHAPES = { # A lot of manual values, but works for now and need 0,0 as rotation and anchor point
-	straight = [Vector2i(-2,0), Vector2i(-1,0), Vector2i(0,0), Vector2i(1,0), Vector2i(2, 0)],
+	straight = [
+			Vector2i(-3,-1), Vector2i(-2,-1), Vector2i(-1,-1), Vector2i(0,-1), Vector2i(1,-1), Vector2i(2, -1), Vector2i(3, -1),
+			Vector2i(-3,0), Vector2i(-2,0), Vector2i(-1,0), Vector2i(0,0), Vector2i(1,0), Vector2i(2, 0), Vector2i(3, 0)],
 	square = [
 			Vector2i(-2,-2), Vector2i(-1,-2), Vector2i(0,-2), Vector2i(1,-2), Vector2i(2,-2), 
 			Vector2i(-2,-1), Vector2i(-1,-1), Vector2i(0,-1), Vector2i(1,-1), Vector2i(2,-1), 
@@ -85,18 +90,26 @@ func _physics_process(delta: float) -> void:
 	circle_check_timer += delta
 	if time_passed >= interval:
 		update_sand()
-		if piece_active:
-			if Input.is_action_pressed("space"):
-				move_down()
+		#if piece_active:
+			#if Input.is_action_pressed("space"):
+				#move_down()
 		time_passed = 0.0
-	if circle_check_timer >= circle_time:
-		check_full_circle()
-		circle_check_timer = 0.0
 	if piece_active:
+		tetris_timer += delta
+		if Input.is_action_pressed("space"):
+			tetris_time = 0.01
+		else:
+			tetris_time = 0.5
 		if Input.is_action_pressed("clockwise"):
 			move_tetris(PI/height)
 		elif Input.is_action_pressed("counter_clockwise"):
 			move_tetris(-PI/height)
+		if tetris_timer >= tetris_time:
+			move_down()
+			tetris_timer = 0.0
+	if circle_check_timer >= circle_time:
+		check_full_circle()
+		circle_check_timer = 0.0
 	queue_redraw()
 
 func circle():
@@ -388,7 +401,7 @@ func spawn_tetris():
 
 func move_tetris(angle: float):
 	var relative = Vector2(anchor) - center
-	var rotated = Vector2(relative.x * cos(angle*10) - relative.y * sin(angle*10), relative.x * sin(angle*10) + relative.y * cos(angle*10))
+	var rotated = Vector2(relative.x * cos(angle*2) - relative.y * sin(angle*2), relative.x * sin(angle*2) + relative.y * cos(angle*2))
 	var new_pos = center+rotated
 	var offset = Vector2i((new_pos-Vector2(anchor)).round())
 	move(offset)
