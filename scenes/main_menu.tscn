@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3 uid="uid://dh6j552ydojs0"]
+
+[ext_resource type="Shader" uid="uid://dtpbkqrwo62oq" path="res://Code/Shaders/main_menu.gdshader" id="1_l6cm7"]
+[ext_resource type="Shader" uid="uid://chqdqh7a8d1im" path="res://Code/Shaders/main_menu_blur.gdshader" id="2_ekxnf"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ekxnf"]
+shader = ExtResource("1_l6cm7")
+shader_parameter/size = Vector2(1280, 720)
+shader_parameter/scale = 0.9
+shader_parameter/pixels = 64.0
+shader_parameter/line_color = Color(0.2, 0.3, 0.5, 1)
+shader_parameter/thickness = 4.0000000596048
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bqqt6"]
+shader = ExtResource("2_ekxnf")
+shader_parameter/blur_radius = 1.60000005225
+shader_parameter/tint = Color(0.9019608, 0.9019608, 0.9490196, 0.16470589)
+shader_parameter/noise_strength = 0.02
+
+[node name="MainMenu" type="Node2D"]
+
+[node name="Background" type="Node" parent="."]
+
+[node name="grid" type="ColorRect" parent="Background"]
+material = SubResource("ShaderMaterial_ekxnf")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="blur" type="ColorRect" parent="Background"]
+material = SubResource("ShaderMaterial_bqqt6")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
