@@ -1,13 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://dh6j552ydojs0"]
+[gd_scene load_steps=7 format=3 uid="uid://dh6j552ydojs0"]
 
 [ext_resource type="Shader" uid="uid://dtpbkqrwo62oq" path="res://Code/Shaders/main_menu.gdshader" id="1_l6cm7"]
+[ext_resource type="Script" uid="uid://dxbpde2ydhpwc" path="res://Code/main_menu.gd" id="1_wu84c"]
 [ext_resource type="Shader" uid="uid://chqdqh7a8d1im" path="res://Code/Shaders/main_menu_blur.gdshader" id="2_ekxnf"]
+[ext_resource type="FontFile" uid="uid://bx5ntou3xk17w" path="res://assets/Montserrat-Black.otf" id="3_bqqt6"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ekxnf"]
 shader = ExtResource("1_l6cm7")
 shader_parameter/size = Vector2(1280, 720)
 shader_parameter/scale = 0.9
-shader_parameter/pixels = 64.0
+shader_parameter/pixels = 32.0
 shader_parameter/line_color = Color(0.2, 0.3, 0.5, 1)
 shader_parameter/thickness = 4.0000000596048
 
@@ -17,7 +19,8 @@ shader_parameter/blur_radius = 1.60000005225
 shader_parameter/tint = Color(0.9019608, 0.9019608, 0.9490196, 0.16470589)
 shader_parameter/noise_strength = 0.02
 
-[node name="MainMenu" type="Node2D"]
+[node name="MainMenu" type="CanvasLayer"]
+script = ExtResource("1_wu84c")
 
 [node name="Background" type="Node" parent="."]
 
@@ -26,8 +29,6 @@ material = SubResource("ShaderMaterial_ekxnf")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1280.0
-offset_bottom = 720.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -36,7 +37,53 @@ material = SubResource("ShaderMaterial_bqqt6")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1280.0
-offset_bottom = 720.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 320
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 320
+theme_override_constants/margin_bottom = 100
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="Label" type="Label" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_bqqt6")
+theme_override_font_sizes/font_size = 100
+text = "TITLE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_bqqt6")
+theme_override_font_sizes/font_size = 75
+text = "Play"
+
+[node name="Button2" type="Button" parent="UI/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_bqqt6")
+theme_override_font_sizes/font_size = 75
+text = "QUIT"
+
+[connection signal="pressed" from="UI/MarginContainer/VBoxContainer/Button" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="UI/MarginContainer/VBoxContainer/Button2" to="." method="_on_button_2_pressed"]

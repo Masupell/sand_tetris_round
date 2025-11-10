@@ -4,7 +4,7 @@ uniform vec2 size;
 
 uniform float scale = 0.9;
 	
-uniform float pixels = 64.0;
+uniform float pixels = 32.0;
 uniform vec3 line_color: source_color = vec3(0.2, 0.3, 0.5);
 uniform float thickness: hint_range(0.1, 10.0, 0.1) = 2.0;
 
@@ -21,7 +21,7 @@ void fragment()
 	uv.x *= size.x/size.y;
 	uv += 0.5;
 
-	float zoom = sin(TIME*0.2)*16.0+(3.0*pixels)/4.0;
+	float zoom = sin(TIME*0.2)*8.0+(3.0*pixels)/4.0;
 	float line_thickness = zoom * thickness / size.y;
 
 	vec2 dist = uv-vec2(0.5);
