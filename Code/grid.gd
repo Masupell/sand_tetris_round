@@ -57,7 +57,7 @@ var colors = [
 	#Color(0.839, 0.851, 0.145, 1.0)
 ]
 
-enum CellType { EMPTY, SAND, TETRIS, WATER, WALL, BARRIER}
+enum CellType { EMPTY, SAND, TETRIS, BARRIER}
 
 class Cell:
 	var type: int = CellType.EMPTY
@@ -133,24 +133,23 @@ func _draw() -> void:
 		for x in width:
 			var idx = y * width + x
 			var box = grid[idx]
-			#if box == 0:
-				#continue
-			#@warning_ignore("integer_division")
-			#var gap_x = (1280-width*size)/2
-			#@warning_ignore("integer_division")
-			#var gap_y = (720-height*size)/2
-			#var outer_rect = Rect2(gap_x+x*size, gap_y+y*size, size, size)
-			#var inner_rect = Rect2(gap_x+x*size+1, gap_y+y*size+1, size-2, size-2)
-			#draw_rect(outer_rect, Color(1.0, 1.0, 1.0, 0.5))
-			#draw_rect(inner_rect, Color(1.0, 0.0, 0.0, 0.5))
-			match box.type:
-				CellType.SAND, CellType.TETRIS: # Only Sand for now, but still match, so I just have to add water, etc later
-					@warning_ignore("integer_division")
-					var gap_x = (1280-width*size)/2
-					@warning_ignore("integer_division")
-					var gap_y = (720-height*size)/2
-					var rect = Rect2(gap_x+x*size, gap_y+y*size, size, size)
-					draw_rect(rect, box.color)#Color(0.753, 0.898, 0.227, 1.0))
+			if box.type == CellType.SAND or box.type == CellType.TETRIS:
+				@warning_ignore("integer_division")
+				var gap_x = (1280-width*size)/2
+				@warning_ignore("integer_division")
+				var gap_y = (720-height*size)/2
+				
+				var rect = Rect2(gap_x+x*size, gap_y+y*size, size, size)
+				
+				draw_rect(rect, box.color)
+				
+				var highlight = box.color.lightened(0.2)
+				draw_line(rect.position, rect.position + Vector2(size, 0), highlight, 2)
+				draw_line(rect.position, rect.position + Vector2(0, size), highlight, 2)
+
+				var shadow = box.color.darkened(0.2)
+				draw_line(rect.position + Vector2(0, size), rect.position + Vector2(size, size), shadow, 2)
+				draw_line(rect.position + Vector2(size, 0), rect.position + Vector2(size, size), shadow, 2)
 
 
 func _input(event: InputEvent) -> void:
