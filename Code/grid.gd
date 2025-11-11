@@ -50,11 +50,11 @@ var TETRIS_SHAPES = { # A lot of manual values, but works for now and need 0,0 a
 
 enum ColorChoice {GREEN, BLUE, RED, BROWN, YELLOW} # Maybe for later, probably gonna remove it
 var colors = [
-	Color(0.753, 0.898, 0.227, 1.0),
-	Color(0.366, 0.41, 0.863, 1.0),
+	#Color(0.753, 0.898, 0.227, 1.0),
+	#Color(0.366, 0.41, 0.863, 1.0),
 	Color(0.678, 0.157, 0.149, 1.0),
-	Color(0.249, 0.102, 0.062, 1.0),
-	Color(0.839, 0.851, 0.145, 1.0)
+	#Color(0.249, 0.102, 0.062, 1.0),
+	#Color(0.839, 0.851, 0.145, 1.0)
 ]
 
 enum CellType { EMPTY, SAND, TETRIS, WATER, WALL, BARRIER}
@@ -101,9 +101,9 @@ func _physics_process(delta: float) -> void:
 		else:
 			tetris_time = 0.5
 		if Input.is_action_pressed("clockwise"):
-			move_tetris(PI/height)
+			move_tetris(1)#PI/height)
 		elif Input.is_action_pressed("counter_clockwise"):
-			move_tetris(-PI/height)
+			move_tetris(-1)#-PI/height)
 		if tetris_timer >= tetris_time:
 			move_down()
 			tetris_timer = 0.0
@@ -399,11 +399,16 @@ func spawn_tetris():
 	piece_active = true
 
 
-func move_tetris(angle: float):
+func move_tetris(dir: int):
 	var relative = Vector2(anchor) - center
-	var rotated = Vector2(relative.x * cos(angle*2) - relative.y * sin(angle*2), relative.x * sin(angle*2) + relative.y * cos(angle*2))
-	var new_pos = center+rotated
-	var offset = Vector2i((new_pos-Vector2(anchor)).round())
+	var r = relative.length()
+	if r == 0:
+		r = 1
+	var ring_cells = max(8 + round(r*4), 1)
+	var angle = dir*TAU / ring_cells
+	var rotated = Vector2(relative.x * cos(angle) - relative.y * sin(angle), relative.x * sin(angle) + relative.y * cos(angle))
+	var new_pos = center + rotated
+	var offset = Vector2i((new_pos - Vector2(anchor)).round())
 	move(offset)
 
 func move_down():
