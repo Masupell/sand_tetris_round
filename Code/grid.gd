@@ -70,12 +70,8 @@ class Cell:
 		extra = _extra
 
 
-#func _ready() -> void:
-	#print("Hello")
-	#grid.resize(width*height)
-	#circle()
-	##grid[2080].type = CellType.SAND
-	#queue_redraw()
+var gap_x = 0
+var gap_y = 0
 
 func setup():
 	size = size/height
@@ -83,6 +79,8 @@ func setup():
 	center = Vector2(width/2,height/2)
 	min_cluster_size = height*2
 	grid.resize(width*height)
+	gap_x = (1280-width*size)/2
+	gap_y = (720-height*size)/2
 	circle()
 
 func _physics_process(delta: float) -> void:
@@ -90,9 +88,6 @@ func _physics_process(delta: float) -> void:
 	circle_check_timer += delta
 	if time_passed >= interval:
 		update_sand()
-		#if piece_active:
-			#if Input.is_action_pressed("space"):
-				#move_down()
 		time_passed = 0.0
 	if piece_active:
 		tetris_timer += delta
@@ -134,11 +129,6 @@ func _draw() -> void:
 			var idx = y * width + x
 			var box = grid[idx]
 			if box.type == CellType.SAND or box.type == CellType.TETRIS:
-				@warning_ignore("integer_division")
-				var gap_x = (1280-width*size)/2
-				@warning_ignore("integer_division")
-				var gap_y = (720-height*size)/2
-				
 				var rect = Rect2(gap_x+x*size, gap_y+y*size, size, size)
 				
 				draw_rect(rect, box.color)
