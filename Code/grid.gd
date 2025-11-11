@@ -61,17 +61,18 @@ enum CellType { EMPTY, SAND, TETRIS, BARRIER}
 
 class Cell:
 	var type: int = CellType.EMPTY
-	var extra: int = 0 # Not needed except for water later (moving left or right)
-	var vel: Vector2 = Vector2.ZERO
 	var color: Color = Color(0.0, 0.0, 0.0)
+	var draw_size: float = 1.0
+	var clear_timer: float = 0.0
 	
-	func _init(_type: int = 0, _extra: int = 0) -> void:
+	func _init(_type: int = 0) -> void:
 		type = _type
-		extra = _extra
 
 
 var gap_x = 0
 var gap_y = 0
+
+var clear_cells: Array = []
 
 func setup():
 	size = size/height
@@ -105,6 +106,20 @@ func _physics_process(delta: float) -> void:
 	if circle_check_timer >= circle_time:
 		check_full_circle()
 		circle_check_timer = 0.0
+	
+	if not clear_cells.is_empty():
+		for arr_idx in range(clear_cells.size() - 1, -1, -1):
+			var cell_idx = clear_cells[arr_idx]
+			var cell = grid[cell_idx]
+			cell.clear_timer -= delta
+			cell.draw_size = max(cell.clear_timer / 0.2, 0)
+			
+			if cell.clear_timer <= 0.0:
+				cell.type = CellType.EMPTY
+				if sand_map.has(cell_idx):
+					remove_sand(cell_idx)
+				cell.draw_size = 1.0
+				clear_cells.remove_at(arr_idx)
 	queue_redraw()
 
 func circle():
@@ -129,17 +144,21 @@ func _draw() -> void:
 			var idx = y * width + x
 			var box = grid[idx]
 			if box.type == CellType.SAND or box.type == CellType.TETRIS:
-				var rect = Rect2(gap_x+x*size, gap_y+y*size, size, size)
+				var draw_s = box.draw_size
+				var rect_size = size * draw_s
+				var rect_pos = Vector2(gap_x + x*size + (size - rect_size)/2, gap_y + y*size + (size - rect_size)/2)
+				var rect = Rect2(rect_pos, Vector2(rect_size, rect_size))
+				#var rect = Rect2(gap_x+x*size, gap_y+y*size, size, size)
 				
 				draw_rect(rect, box.color)
 				
 				var highlight = box.color.lightened(0.2)
-				draw_line(rect.position, rect.position + Vector2(size, 0), highlight, 2)
-				draw_line(rect.position, rect.position + Vector2(0, size), highlight, 2)
+				draw_line(rect.position, rect.position + Vector2(rect_size, 0), highlight, 2)
+				draw_line(rect.position, rect.position + Vector2(0, rect_size), highlight, 2)
 
 				var shadow = box.color.darkened(0.2)
-				draw_line(rect.position + Vector2(0, size), rect.position + Vector2(size, size), shadow, 2)
-				draw_line(rect.position + Vector2(size, 0), rect.position + Vector2(size, size), shadow, 2)
+				draw_line(rect.position + Vector2(0, rect_size), rect.position + Vector2(rect_size, rect_size), shadow, 2)
+				draw_line(rect.position + Vector2(rect_size, 0), rect.position + Vector2(rect_size, rect_size), shadow, 2)
 
 
 func _input(event: InputEvent) -> void:
@@ -150,6 +169,9 @@ func _input(event: InputEvent) -> void:
 		#print(grid_pos)
 		
 		match event.button_index:
+			MOUSE_BUTTON_MIDDLE:
+				var idx = grid_pos.y * width + grid_pos.x
+				print(grid[idx].type)
 			MOUSE_BUTTON_LEFT:
 				for y in [-1, 0, 1]:
 					for x in [-1, 0, 1]:
@@ -328,10 +350,10 @@ func check_full_circle():
 			if is_ring_connected(color):
 				for pos in cluster:
 					var clear_idx = pos.y * width + pos.x
-					grid[clear_idx].type = CellType.EMPTY
-					#sand_cells.erase(clear_idx) # Deleting while iterating over it, but works for now
-					#sand_map.erase(clear_idx)
-					remove_sand(clear_idx)
+					grid[clear_idx].clear_timer = 0.2
+					clear_cells.append(clear_idx)
+					#grid[clear_idx].type = CellType.EMPTY
+					#remove_sand(clear_idx)
 
 func is_ring_connected(color: Color) -> bool:
 	var seen = {}
