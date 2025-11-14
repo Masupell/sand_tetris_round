@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://cb8sf5lu5g8wi"]
+[gd_scene load_steps=9 format=3 uid="uid://cb8sf5lu5g8wi"]
 
 [ext_resource type="PackedScene" uid="uid://b2ktwpe1kd50a" path="res://scenes/grid.tscn" id="1_7g83o"]
 [ext_resource type="Script" uid="uid://v7rpsn876c2l" path="res://Code/world.gd" id="1_d1c63"]
 [ext_resource type="Shader" uid="uid://bqaj0kj5t3dg1" path="res://Code/Shaders/world.gdshader" id="1_kqs1s"]
 [ext_resource type="Shader" uid="uid://cjkd1w5c2ag63" path="res://Code/Shaders/menu_blur.gdshader" id="4_d1c63"]
 [ext_resource type="FontFile" uid="uid://bx5ntou3xk17w" path="res://assets/Montserrat-Black.otf" id="5_1lgw5"]
+[ext_resource type="PackedScene" uid="uid://cacmwf7p3l831" path="res://scenes/ui.tscn" id="6_hlk0d"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_32lhk"]
 shader = ExtResource("1_kqs1s")
@@ -56,3 +57,13 @@ offset_bottom = 109.0
 theme_override_fonts/font = ExtResource("5_1lgw5")
 theme_override_font_sizes/font_size = 64
 horizontal_alignment = 1
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI" parent="CanvasLayer" instance=ExtResource("6_hlk0d")]
+visible = false
+
+[connection signal="pressed" from="CanvasLayer/UI/MarginContainer/VBoxContainer/Menu" to="." method="_on_menu_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI/MarginContainer/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
+
+[editable path="CanvasLayer/UI"]

@@ -1,0 +1,72 @@
+[gd_scene load_steps=2 format=3 uid="uid://cacmwf7p3l831"]
+
+[ext_resource type="FontFile" uid="uid://bx5ntou3xk17w" path="res://assets/Montserrat-Black.otf" id="1_nt7q6"]
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 640
+theme_override_constants/margin_bottom = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7529412, 0.8980392, 0.21960784, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_fonts/font = ExtResource("1_nt7q6")
+theme_override_font_sizes/font_size = 150
+text = "TITLE"
+
+[node name="Score" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_nt7q6")
+theme_override_font_sizes/font_size = 60
+text = "  Score: 65"
+
+[node name="Highscore" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("1_nt7q6")
+theme_override_font_sizes/font_size = 60
+text = "  HighScore: 322"
+
+[node name="Menu" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3647059, 0.4117647, 0.8627451, 1)
+theme_override_colors/font_pressed_color = Color(0.3647059, 0.4117647, 0.8627451, 1)
+theme_override_colors/font_hover_color = Color(0.24705882, 0.27058825, 0.6901961, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.32889315, 0.36846462, 0.82547086, 1)
+theme_override_fonts/font = ExtResource("1_nt7q6")
+theme_override_font_sizes/font_size = 75
+text = " Main Menu"
+flat = true
+alignment = 0
+
+[node name="Quit" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.24705882, 0.101960786, 0.0627451, 1)
+theme_override_colors/font_pressed_color = Color(0.24705882, 0.101960786, 0.0627451, 1)
+theme_override_colors/font_hover_color = Color(0.16862746, 0.05882353, 0.03137255, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.3616206, 0.15789008, 0.10599593, 1)
+theme_override_fonts/font = ExtResource("1_nt7q6")
+theme_override_font_sizes/font_size = 75
+text = " Quit"
+flat = true
+alignment = 0
