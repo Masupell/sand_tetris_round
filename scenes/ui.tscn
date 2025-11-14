@@ -45,10 +45,11 @@ text = "  Score: 65"
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_nt7q6")
 theme_override_font_sizes/font_size = 60
-text = "  HighScore: 322"
+text = "  HighScore: 0"
 
 [node name="Menu" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_mode = 0
 theme_override_colors/font_color = Color(0.3647059, 0.4117647, 0.8627451, 1)
 theme_override_colors/font_pressed_color = Color(0.3647059, 0.4117647, 0.8627451, 1)
 theme_override_colors/font_hover_color = Color(0.24705882, 0.27058825, 0.6901961, 1)
@@ -61,6 +62,7 @@ alignment = 0
 
 [node name="Quit" type="Button" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+focus_mode = 0
 theme_override_colors/font_color = Color(0.24705882, 0.101960786, 0.0627451, 1)
 theme_override_colors/font_pressed_color = Color(0.24705882, 0.101960786, 0.0627451, 1)
 theme_override_colors/font_hover_color = Color(0.16862746, 0.05882353, 0.03137255, 1)
