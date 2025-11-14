@@ -11,8 +11,8 @@ var pause: bool = false
 @onready var score_label_one = $Score
 
 @onready var ui = $CanvasLayer/UI
-@onready var score_label_two = $CanvasLayer/UI/MarginContainer/VBoxContainer/Score
-@onready var high_score_label = $CanvasLayer/UI/MarginContainer/VBoxContainer/Highscore
+@onready var score_label_two = $CanvasLayer/UI/MarginContainer/HBoxContainer/VBoxContainer/Score
+@onready var high_score_label = $CanvasLayer/UI/MarginContainer/HBoxContainer/VBoxContainer/Highscore
 
 var high: HighScore = null
 
@@ -68,6 +68,11 @@ func _on_menu_pressed() -> void:
 
 func _on_quit_pressed() -> void:
 	get_tree().quit()
+
+
+func _on_check_button_toggled(toggled_on: bool) -> void:
+	grid.mouse = toggled_on
+
 
 func save() -> void:
 	var error_code := ResourceSaver.save(high, SAVE_PATH)

@@ -19,14 +19,18 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 25
 theme_override_constants/margin_top = 25
-theme_override_constants/margin_right = 640
+theme_override_constants/margin_right = 25
 theme_override_constants/margin_bottom = 25
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 600
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Title" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="Title" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7529412, 0.8980392, 0.21960784, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
@@ -35,19 +39,19 @@ theme_override_fonts/font = ExtResource("1_nt7q6")
 theme_override_font_sizes/font_size = 150
 text = "TITLE"
 
-[node name="Score" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="Score" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_nt7q6")
 theme_override_font_sizes/font_size = 60
 text = "  Score: 65"
 
-[node name="Highscore" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="Highscore" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("1_nt7q6")
 theme_override_font_sizes/font_size = 60
 text = "  HighScore: 0"
 
-[node name="Menu" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="Menu" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 focus_mode = 0
 theme_override_colors/font_color = Color(0.3647059, 0.4117647, 0.8627451, 1)
@@ -60,7 +64,7 @@ text = " Main Menu"
 flat = true
 alignment = 0
 
-[node name="Quit" type="Button" parent="MarginContainer/VBoxContainer"]
+[node name="Quit" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 layout_mode = 2
 focus_mode = 0
 theme_override_colors/font_color = Color(0.24705882, 0.101960786, 0.0627451, 1)
@@ -72,3 +76,10 @@ theme_override_font_sizes/font_size = 75
 text = " Quit"
 flat = true
 alignment = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="CheckButton" type="CheckButton" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+text = "Mouse Spawning  "

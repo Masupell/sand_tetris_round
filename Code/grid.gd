@@ -77,6 +77,7 @@ var initial_size := 0
 
 var score := 0
 
+var mouse: bool = false
 
 func setup():
 	size = size/height
@@ -171,39 +172,31 @@ func _draw() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.is_released():
-		var pos = event.position
-		#print(pos)
-		var grid_pos = Vector2i((pos.x-(1280-width*size)/2)/size, pos.y/size)
-		#print(grid_pos)
-		
-		match event.button_index:
-			MOUSE_BUTTON_MIDDLE:
-				var idx = grid_pos.y * width + grid_pos.x
-				print(grid[idx].type)
-			MOUSE_BUTTON_LEFT:
-				for y in [-1, 0, 1]:
-					for x in [-1, 0, 1]:
-						var idx = (grid_pos.y+y) * width + (grid_pos.x+x)
-						if idx < width*height:
-							#print(cell_angle(grid_pos))
-							if grid[idx].type == CellType.EMPTY:
-								grid[idx].type = CellType.SAND
-								grid[idx].color = Color(0.753, 0.898, 0.227, 1.0)#Color(randf(), randf(), randf())
-								sand_cells.append(idx)
-								sand_map[idx] = sand_cells.size()-1
-			MOUSE_BUTTON_RIGHT:
-				for y in [-1, 0, 1]:
-					for x in [-1, 0, 1]:
-						var idx = (grid_pos.y+y) * width + (grid_pos.x+x)
-						if idx < width*height:
-							#print(cell_angle(grid_pos))
-							if grid[idx].type == CellType.EMPTY:
-								grid[idx].type = CellType.SAND
-								grid[idx].color = Color(0.366, 0.41, 0.863, 1.0)
-								sand_cells.append(idx)
-								sand_map[idx] = sand_cells.size()-1
-	#if event.is_action_released("space"):
-		#spawn_tetris()
+		if mouse:
+			var pos = event.position
+			var grid_pos = Vector2i((pos.x-(1280-width*size)/2)/size, pos.y/size)
+			
+			match event.button_index:
+				MOUSE_BUTTON_LEFT:
+					for y in [-1, 0, 1]:
+						for x in [-1, 0, 1]:
+							var idx = (grid_pos.y+y) * width + (grid_pos.x+x)
+							if idx < width*height:
+								if grid[idx].type == CellType.EMPTY:
+									grid[idx].type = CellType.SAND
+									grid[idx].color = Color(0.753, 0.898, 0.227, 1.0)#Color(randf(), randf(), randf())
+									sand_cells.append(idx)
+									sand_map[idx] = sand_cells.size()-1
+				MOUSE_BUTTON_RIGHT:
+					for y in [-1, 0, 1]:
+						for x in [-1, 0, 1]:
+							var idx = (grid_pos.y+y) * width + (grid_pos.x+x)
+							if idx < width*height:
+								if grid[idx].type == CellType.EMPTY:
+									grid[idx].type = CellType.SAND
+									grid[idx].color = Color(0.366, 0.41, 0.863, 1.0)
+									sand_cells.append(idx)
+									sand_map[idx] = sand_cells.size()-1
 
 func spawn_sand(): #Spawns a single sand-block in the center
 	var color = colors.pick_random()

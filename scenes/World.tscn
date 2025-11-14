@@ -63,7 +63,6 @@ horizontal_alignment = 1
 [node name="UI" parent="CanvasLayer" instance=ExtResource("6_hlk0d")]
 visible = false
 
-[connection signal="pressed" from="CanvasLayer/UI/MarginContainer/VBoxContainer/Menu" to="." method="_on_menu_pressed"]
-[connection signal="pressed" from="CanvasLayer/UI/MarginContainer/VBoxContainer/Quit" to="." method="_on_quit_pressed"]
+[connection signal="toggled" from="CanvasLayer/UI/MarginContainer/HBoxContainer/VBoxContainer2/CheckButton" to="." method="_on_check_button_toggled"]
 
 [editable path="CanvasLayer/UI"]
