@@ -73,6 +73,10 @@ var gap_x = 0
 var gap_y = 0
 
 var clear_cells: Array = []
+var initial_size := 0
+
+var score := 0
+
 
 func setup():
 	size = size/height
@@ -121,6 +125,9 @@ func update(delta: float):
 					remove_sand(cell_idx)
 				cell.draw_size = 1.0
 				clear_cells.remove_at(arr_idx)
+		if clear_cells.size() <= 0:
+			score += initial_size
+			initial_size = 0
 	queue_redraw()
 
 func circle():
@@ -352,6 +359,7 @@ func check_full_circle():
 					var clear_idx = pos.y * width + pos.x
 					grid[clear_idx].clear_timer = 0.2
 					clear_cells.append(clear_idx)
+					initial_size += 1
 					#grid[clear_idx].type = CellType.EMPTY
 					#remove_sand(clear_idx)
 

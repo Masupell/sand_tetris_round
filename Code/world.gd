@@ -6,6 +6,7 @@ var pause: bool = false
 
 @onready var grid = $Grid
 @onready var blur = $Blur
+@onready var score_label = $Score
 
 func _ready() -> void:
 	randomize()
@@ -30,3 +31,4 @@ func toggle_pause(paused: bool):
 func _physics_process(delta: float) -> void:
 	if !pause:
 		grid.update(delta)
+		score_label.text = str(grid.score/10) # Better with signal probably, but works for now
