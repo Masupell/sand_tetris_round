@@ -50,12 +50,17 @@ var TETRIS_SHAPES = { # A lot of manual values, but works for now and need 0,0 a
 
 enum ColorChoice {GREEN, BLUE, RED, BROWN, YELLOW} # Maybe for later, probably gonna remove it
 var colors = [
-	#Color(0.753, 0.898, 0.227, 1.0),
-	#Color(0.366, 0.41, 0.863, 1.0),
+	Color(0.753, 0.898, 0.227, 1.0),
+	Color(0.366, 0.41, 0.863, 1.0),
 	Color(0.678, 0.157, 0.149, 1.0),
-	#Color(0.249, 0.102, 0.062, 1.0),
+	Color(0.249, 0.102, 0.062, 1.0),
 	#Color(0.839, 0.851, 0.145, 1.0)
 ]
+
+var unlocked_colors: Array = []
+var unlock_timer: float = 0.0
+var unlock_interval: float= 30.0
+var unlock_finish: bool = false
 
 enum CellType { EMPTY, SAND, TETRIS, BARRIER}
 
@@ -87,12 +92,15 @@ func setup():
 	grid.resize(width*height)
 	gap_x = (1280-width*size)/2
 	gap_y = (720-height*size)/2
+	unlocked_colors.append(colors[0])
 	circle()
 
 #func _physics_process(delta: float) -> void:
 func update(delta: float):
 	time_passed += delta
 	circle_check_timer += delta
+	if !unlock_finish:
+		unlock_timer += delta
 	if time_passed >= interval:
 		update_sand()
 		time_passed = 0.0
@@ -112,6 +120,15 @@ func update(delta: float):
 	if circle_check_timer >= circle_time:
 		check_full_circle()
 		circle_check_timer = 0.0
+	
+	if unlock_timer >= unlock_interval:
+		var next_color = unlocked_colors.size()
+		if next_color < colors.size():
+			unlocked_colors.append(colors[next_color])
+			unlock_interval += unlock_timer
+			unlock_timer = 0.0
+		else:
+			unlock_finish = true
 	
 	if not clear_cells.is_empty():
 		for arr_idx in range(clear_cells.size() - 1, -1, -1):
@@ -401,7 +418,7 @@ func spawn_tetris():
 	tetris_pieces = random_shape.duplicate()
 	
 	anchor = center
-	tetris_color = colors.pick_random()
+	tetris_color = unlocked_colors.pick_random()
 	
 	for i in range(tetris_pieces.size()):
 		tetris_pieces[i] += anchor
