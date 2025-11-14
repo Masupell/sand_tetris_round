@@ -1,9 +1,10 @@
 shader_type canvas_item;
 
-uniform sampler2D SCREEN_TEXTURE : hint_screen_texture;
-uniform float blur_radius : hint_range(0.5, 5.0) = 1.6;
-uniform vec4 tint : source_color = vec4(0.9, 0.9, 0.95, 0.16);
-uniform float noise_strength : hint_range(0.0,0.05) = 0.02;
+uniform sampler2D SCREEN_TEXTURE: hint_screen_texture;
+uniform float blur_radius: hint_range(0.5, 5.0) = 1.6;
+uniform vec4 tint: source_color = vec4(0.9, 0.9, 0.95, 0.16);
+uniform float noise_strength: hint_range(0.0,0.05) = 0.02;
+uniform float darkness: hint_range(0.0, 1.0, 0.1) = 0.3;
 
 float rand(vec2 co)
 {
@@ -35,6 +36,7 @@ void fragment()
     vec3 noise = vec3(n);
 
     vec3 final_color = mix(blurred, tint.rgb, tint.a) + noise;
+	final_color = mix(final_color, vec3(0,0,0), darkness);
 
     COLOR = vec4(final_color,1.0);
 }

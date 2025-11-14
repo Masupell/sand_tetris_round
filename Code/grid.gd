@@ -84,7 +84,8 @@ func setup():
 	gap_y = (720-height*size)/2
 	circle()
 
-func _physics_process(delta: float) -> void:
+#func _physics_process(delta: float) -> void:
+func update(delta: float):
 	time_passed += delta
 	circle_check_timer += delta
 	if time_passed >= interval:
@@ -194,9 +195,8 @@ func _input(event: InputEvent) -> void:
 								grid[idx].color = Color(0.366, 0.41, 0.863, 1.0)
 								sand_cells.append(idx)
 								sand_map[idx] = sand_cells.size()-1
-	if event.is_action_released("ui_accept"):
-		#spawn_sand()
-		spawn_tetris()
+	#if event.is_action_released("space"):
+		#spawn_tetris()
 
 func spawn_sand(): #Spawns a single sand-block in the center
 	var color = colors.pick_random()

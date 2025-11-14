@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cb8sf5lu5g8wi"]
+[gd_scene load_steps=7 format=3 uid="uid://cb8sf5lu5g8wi"]
 
 [ext_resource type="PackedScene" uid="uid://b2ktwpe1kd50a" path="res://scenes/grid.tscn" id="1_7g83o"]
 [ext_resource type="Script" uid="uid://v7rpsn876c2l" path="res://Code/world.gd" id="1_d1c63"]
 [ext_resource type="Shader" uid="uid://bqaj0kj5t3dg1" path="res://Code/Shaders/world.gdshader" id="1_kqs1s"]
+[ext_resource type="Shader" uid="uid://cjkd1w5c2ag63" path="res://Code/Shaders/menu_blur.gdshader" id="4_d1c63"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_32lhk"]
 shader = ExtResource("1_kqs1s")
@@ -12,6 +13,13 @@ shader_parameter/pixels = 64.0
 shader_parameter/line_color = Color(0.2, 0.3, 0.5, 1)
 shader_parameter/thickness = 2.0
 shader_parameter/brightness = 2.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1lgw5"]
+shader = ExtResource("4_d1c63")
+shader_parameter/blur_radius = 1.6
+shader_parameter/tint = Color(0.9, 0.9, 0.95, 0.16)
+shader_parameter/noise_strength = 0.02
+shader_parameter/darkness = 0.30000000447036
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_d1c63")
@@ -27,3 +35,14 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Grid" parent="." instance=ExtResource("1_7g83o")]
+
+[node name="Blur" type="ColorRect" parent="."]
+visible = false
+material = SubResource("ShaderMaterial_1lgw5")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
